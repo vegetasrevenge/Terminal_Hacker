@@ -14,30 +14,25 @@ public class Hacker : MonoBehaviour
     List<string> words2 = new List<string>() { "private", "juggalo", "hooplah" };
     List<string> words3 = new List<string>() { "metamorphosis", "juxtaposition", "ideologies" };
 
-    string password;
-    int level;
+    string password = "password";
+    int level = 1;
     string word;
 	// Use this for initialization
 	void Start () {
         ShowMenu();
 	}
 
-    void StartGame()
-    {
-        currentScreen = Screen.Password;
-        Terminal.WriteLine("Please enter your password");
-    }
-
     void ShowMenu()
     {
         currentScreen = Screen.Menu;
         Terminal.ClearScreen();
         Terminal.WriteLine("Hello, Doofus");
-        Terminal.WriteLine("Let's guess anagrams? \n");
-        Terminal.WriteLine("Select a difficulty by number: \n" +
-                           "1) Easy \n" +
-                           "2) Medium \n" +
-                           "3) Are you CRAZY?! \n");
+        Terminal.WriteLine("Let's guess anagrams! \n");
+        Terminal.WriteLine("You'll start at level 1, going up a level of difficulty with each successful guess");
+        //Terminal.WriteLine("Select a difficulty by number: \n" +
+                           //"1) Easy \n" +
+                           //"2) Medium \n" +
+                           //"3) Are you CRAZY?! \n");
         Terminal.WriteLine("Type 'menu' to go back");
     }
 
@@ -49,7 +44,7 @@ public class Hacker : MonoBehaviour
         }
         else if (currentScreen == Screen.Menu)
         {
-            MenuInput(input);
+            MenuInput();
         }
         else if (currentScreen == Screen.Password)
         {
@@ -91,23 +86,28 @@ public class Hacker : MonoBehaviour
 
 
 
-    void MenuInput(string input)
+    void MenuInput()
     {
-        if (input == "1"){
-            level = 1;
-            password = "password";
+        //bool isValidLevel = (input == "1" || input == "2");
+        //if (isValidLevel) 
+        //{
+        //    level = int.Parse(input);
+        //    StartGame();
+        //}
+        if (Input.GetKeyDown(KeyCode.Return)) {
             StartGame();
-        }else if (input == "2"){
-            level = 2;
-            password = "newPassword";
-            StartGame();
-        }else if (input == "3"){
-            level = 3;
-            StartGame();
-
-        }else{
+        }
+        else
+        {
             Terminal.WriteLine("Please make a valid input");
         }
+    }
+
+    void StartGame()
+    {
+        currentScreen = Screen.Password;
+        Terminal.ClearScreen();
+        Terminal.WriteLine("Please enter your password");
     }
 
     void EnterPassword(string input) {
@@ -122,32 +122,54 @@ public class Hacker : MonoBehaviour
 
     void Words(){
         Terminal.ClearScreen();
-        if (level == 1){
-            word = RandomWord(words1);
-            string shuffledWord = Shuffle(word);
-            Terminal.WriteLine("Your word is: " + shuffledWord);
-        }else if (level == 2){
-            word = RandomWord(words2);
-            string shuffledWord = Shuffle(word);
-            Terminal.WriteLine("Your word is: " + shuffledWord);
-        }else if (level == 3){
-            word = RandomWord(words3);
-            string shuffledWord = Shuffle(word);
-            Terminal.WriteLine("Your word is: " + shuffledWord);
+
+        switch (level)
+        {
+            case 1:
+                word = RandomWord(words1);
+                break;
+            case 2:
+                word = RandomWord(words2);
+                break;
+            case 3:
+                word = RandomWord(words3);
+                break;
+            default:
+                throw new Exception();
+                Debug.LogError("Error in word selection");
         }
+        string shuffleWord = Shuffle(word);
+        Terminal.WriteLine("Your word is: " + shuffleWord);
+
+        //if (level == 1){
+        //    word = RandomWord(words1);
+        //    string shuffledWord = Shuffle(word);
+        //    Terminal.WriteLine("Your word is: " + shuffledWord);
+        //}else if (level == 2){
+        //    word = RandomWord(words2);
+        //    string shuffledWord = Shuffle(word);
+        //    Terminal.WriteLine("Your word is: " + shuffledWord);
+        //}else if (level == 3){
+        //    word = RandomWord(words3);
+        //    string shuffledWord = Shuffle(word);
+        //    Terminal.WriteLine("Your word is: " + shuffledWord);
+        //}
     }
 
     void WordGuess(string input) {
-        if (level == 3 && input == word) {
-            WinGame();
+       
+        if (level == 3 && input == word) 
+        {
+            Terminal.WriteLine("I see you've bested me, you scallywag. Press 'Return'");
+            currentScreen = Screen.Win;
         }
         else if (input == word)
         {    
-            Terminal.WriteLine("Nice! Try the next level.");
             level += 1;
             Words();
         } 
-         else {
+         else 
+        {
             Terminal.WriteLine("Try again :(");
         }
     }
@@ -156,6 +178,7 @@ public class Hacker : MonoBehaviour
         Terminal.WriteLine("You win, but you're not too smart. Press Return");
         currentScreen = Screen.Win;
     }
+
 
     void PlayAgain(string input) {
         Terminal.WriteLine("Play Again? (y or n)");
